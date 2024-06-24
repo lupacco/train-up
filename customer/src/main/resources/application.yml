@@ -1,0 +1,21 @@
+server:
+  port: 8085
+  error:
+    include-stacktrace: on_param
+
+spring:
+  application:
+    name: train-up
+  flyway:
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/train-up
+    username: postgres
+    password: petzzz
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    sql: debug
