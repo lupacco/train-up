@@ -8,14 +8,22 @@ spring:
     name: train-up
   flyway:
     baseline-on-migrate: true
+    url: ${DATABASE_URL:}
+    user: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
   datasource:
     url: jdbc:postgresql://localhost:5432/train-up
-    username: postgres
-    password: petzzz
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
 logging:
   level:
     sql: debug
+    br.com.customer: DEBUG
+
+jwt:
+  public-key: classpath:app.pub
+  private-key: classpath:app.key

@@ -1,4 +1,4 @@
-package br.com.exception;
+package br.com.customer.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
