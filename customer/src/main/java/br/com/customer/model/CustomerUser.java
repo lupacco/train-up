@@ -1,4 +1,4 @@
-package br.com.model;
+package br.com.customer.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -17,10 +17,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Data
-public class Customer {
+public class CustomerUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
@@ -38,15 +38,26 @@ public class Customer {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    @Column(nullable = false)
+    @OneToMany(mappedBy = "createdByUser")
+    private Set<Workout> createdWorkouts;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_workout",
+            joinColumns = @JoinColumn(name = "customer_user_id")
+            ,inverseJoinColumns = @JoinColumn(name = "workout_id")
+    )
+    private Set<Workout> assignedWorkouts;
+
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }

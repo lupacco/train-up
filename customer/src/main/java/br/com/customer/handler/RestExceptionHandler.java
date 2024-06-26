@@ -1,7 +1,7 @@
-package br.com.handler;
+package br.com.customer.handler;
 
-import br.com.exception.ConflictException;
-import br.com.exception.ExceptionDetails;
+import br.com.customer.exception.ConflictException;
+import br.com.customer.exception.ExceptionDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

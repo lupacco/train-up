@@ -1,9 +1,8 @@
-package br.com.core.request;
+package br.com.customer.dto.request;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public record RegisterPostRequest(
+public record RegisterRequest(
         String name,
         String username,
         String email,

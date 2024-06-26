@@ -1,4 +1,4 @@
-package br.com;
+package br.com.customer;
 
 public class Main {
     public static void main(String[] args) {

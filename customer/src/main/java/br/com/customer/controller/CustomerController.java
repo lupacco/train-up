@@ -1,4 +1,4 @@
-package br.com.controller;
+package br.com.customer.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
