@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.awt.geom.Area;
 import java.time.LocalDateTime;
 
 @Service
@@ -18,10 +17,10 @@ import java.time.LocalDateTime;
 public class WorkoutService {
 
     private final WorkoutRepository workoutRepository;
-    private final CustomerService customerService;
+    private final CustomerUserService customerUserService;
 
     public WorkoutGetResponse create(CreateWorkoutRequest createWorkoutRequest){
-        CustomerUser customerUser = customerService.findById(createWorkoutRequest.userId());
+        CustomerUser customerUser = customerUserService.findById(createWorkoutRequest.userId());
         log.debug("[start] WorkoutService - create");
         Workout workout = Workout.builder()
                 .name(createWorkoutRequest.name())
@@ -33,10 +32,13 @@ public class WorkoutService {
                 .deletedAt(null)
                 .build();
 
-        Workout createdWorkout = workoutRepository.save(workout);
+        Workout result = workoutRepository.save(workout);
         log.debug("[finish] WorkoutService - create");
         return WorkoutGetResponse.builder()
-                .workout(createdWorkout)
+                .id(result.getId())
+                .name(result.getName())
+                .iconId(result.getIconId())
+                .createdByUser(result.getCreatedByUser().toGetResponse())
                 .build();
     }
 }
