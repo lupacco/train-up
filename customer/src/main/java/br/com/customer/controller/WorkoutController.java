@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/workout")
+@RequestMapping("/api/v1/workout")
 @Slf4j
 public class WorkoutController {
 
