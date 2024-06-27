@@ -37,4 +37,5 @@ public class WorkoutController {
         log.debug("[finish] WorkoutController - createExercise");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 }
