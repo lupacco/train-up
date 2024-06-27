@@ -1,6 +1,5 @@
 package br.com.customer.service;
 
-import br.com.customer.dto.request.RegisterRequest;
 import br.com.customer.exception.UserEmailNotFoundException;
 import br.com.customer.model.CustomerUser;
 import br.com.customer.repository.CustomerUserRepository;
@@ -9,13 +8,12 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class CustomerService {
+public class CustomerUserService {
 
     private final CustomerUserRepository customerUserRepository;
 

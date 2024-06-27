@@ -1,5 +1,6 @@
 package br.com.customer.model;
 
+import br.com.customer.dto.response.CustomerUserGetResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,4 +61,14 @@ public class CustomerUser {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public CustomerUserGetResponse toGetResponse(){
+        return CustomerUserGetResponse.builder()
+                .id(this.id)
+                .name(this.name)
+                .username(this.username)
+                .email(this.email)
+                .birthdate(this.birthdate)
+                .build();
+    }
 }

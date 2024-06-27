@@ -3,6 +3,7 @@ package br.com.customer.controller;
 import br.com.customer.dto.request.AuthenticationRequest;
 import br.com.customer.dto.request.RegisterRequest;
 import br.com.customer.dto.response.AuthenticationResponse;
+import br.com.customer.dto.response.CustomerUserGetResponse;
 import br.com.customer.model.CustomerUser;
 import br.com.customer.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<CustomerUser> register(@RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<CustomerUserGetResponse> register(@RequestBody RegisterRequest registerRequest){
         log.debug("[start] AuthController - register");
         var response = authService.register(registerRequest);
         log.debug("[finish] AuthController - register");

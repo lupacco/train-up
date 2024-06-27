@@ -3,6 +3,7 @@ package br.com.customer.service;
 import br.com.customer.dto.request.AuthenticationRequest;
 import br.com.customer.dto.request.RegisterRequest;
 import br.com.customer.dto.response.AuthenticationResponse;
+import br.com.customer.dto.response.CustomerUserGetResponse;
 import br.com.customer.exception.ConflictException;
 import br.com.customer.model.CustomerUser;
 import br.com.customer.model.UserAuthenticated;
@@ -30,7 +31,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public CustomerUser register(RegisterRequest registerRequest){
+    public CustomerUserGetResponse register(RegisterRequest registerRequest){
+        log.debug("[start] AuthService - register");
         if(customerUserRepository.findByUsername(registerRequest.username()).isPresent()) throw new ConflictException("Username already in use.");
         if(customerUserRepository.findByEmail(registerRequest.email()).isPresent()) throw new ConflictException("Email already in use.");
         CustomerUser customer = CustomerUser.builder()
@@ -44,17 +46,18 @@ public class AuthService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        var response = customerUserRepository.save(customer);
-        return response;
+        CustomerUser result = customerUserRepository.save(customer);
+        log.debug("[finish] AuthService - register");
+
+        return CustomerUserGetResponse.builder()
+                .id(result.getId())
+                .name(result.getName())
+                .username(result.getUsername())
+                .email(result.getEmail())
+                .birthdate(result.getBirthdate())
+                .build();
     }
 
-//    public AuthenticationResponse authenticate(Authentication authenticationRequest) {
-//        String token = jwtService.generateToken(authenticationRequest);
-//
-//        return AuthenticationResponse.builder()
-//                .token(token)
-//                .build();
-//    }
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 authenticationRequest.username(),

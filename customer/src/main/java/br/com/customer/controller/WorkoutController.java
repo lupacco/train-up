@@ -22,7 +22,6 @@ public class WorkoutController {
         log.debug("[start] WorkoutController - createWorkout");
         var response = workoutService.create(createWorkoutRequest);
         log.debug("[finish] WorkoutController - createWorkout");
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
