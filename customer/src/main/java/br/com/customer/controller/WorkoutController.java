@@ -33,7 +33,6 @@ public class WorkoutController {
     @PostMapping("/{workoutId}/exercise")
     public ResponseEntity<List<ExerciseGetResponse>> createExercises(@PathVariable(name = "workoutId") UUID workoutId, @RequestBody List<CreateExerciseRequest> createExerciseRequest){
         log.debug("[start] WorkoutController - createExercise");
-        log.info(workoutId.toString());
         var response = workoutService.createExercises(workoutId, createExerciseRequest);
         log.debug("[finish] WorkoutController - createExercise");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

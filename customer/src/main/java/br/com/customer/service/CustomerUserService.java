@@ -1,5 +1,6 @@
 package br.com.customer.service;
 
+import br.com.customer.dto.response.CustomerUserGetResponse;
 import br.com.customer.exception.UserEmailNotFoundException;
 import br.com.customer.model.CustomerUser;
 import br.com.customer.repository.CustomerUserRepository;
@@ -17,12 +18,12 @@ public class CustomerUserService {
 
     private final CustomerUserRepository customerUserRepository;
 
-    public CustomerUser findByUsername(String username){
+    public CustomerUserGetResponse findByUsername(String username){
         log.debug("[start] CustomerService - findByUsername");
         var result = customerUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
         log.debug("[finish] CustomerService - findByUsername");
-        return result;
+        return result.toGetResponse();
     }
 
     public CustomerUser findByEmail(String email){
