@@ -35,4 +35,11 @@ public class CustomerService {
         return result;
     }
 
+    public CustomerUser findById(UUID id) {
+        log.debug("[start] CustomerService - findById");
+        var result = customerUserRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+        log.debug("[finish] CustomerService - findById");
+        return result;
+    }
 }
