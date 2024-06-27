@@ -1,15 +1,23 @@
 package br.com.customer.service;
 
+import br.com.customer.dto.request.CreateExerciseRequest;
 import br.com.customer.dto.request.CreateWorkoutRequest;
+import br.com.customer.dto.response.ExerciseGetResponse;
 import br.com.customer.dto.response.WorkoutGetResponse;
-import br.com.customer.model.CustomerUser;
-import br.com.customer.model.Workout;
+import br.com.customer.exception.WorkoutNotFoundException;
+import br.com.customer.model.*;
+import br.com.customer.repository.ExerciseRepository;
+import br.com.customer.repository.WorkoutExerciseRepository;
 import br.com.customer.repository.WorkoutRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +25,14 @@ import java.time.LocalDateTime;
 public class WorkoutService {
 
     private final WorkoutRepository workoutRepository;
+    private final WorkoutExerciseRepository workoutExerciseRepository;
+    private final ExerciseRepository exerciseRepository;
     private final CustomerUserService customerUserService;
 
-    public WorkoutGetResponse create(CreateWorkoutRequest createWorkoutRequest){
+    @Transactional
+    public WorkoutGetResponse createWorkout(CreateWorkoutRequest createWorkoutRequest){
         CustomerUser customerUser = customerUserService.findById(createWorkoutRequest.userId());
-        log.debug("[start] WorkoutService - create");
+        log.debug("[start] WorkoutService - createWorkout");
         Workout workout = Workout.builder()
                 .name(createWorkoutRequest.name())
                 .iconId(createWorkoutRequest.iconId())
@@ -33,12 +44,40 @@ public class WorkoutService {
                 .build();
 
         Workout result = workoutRepository.save(workout);
-        log.debug("[finish] WorkoutService - create");
-        return WorkoutGetResponse.builder()
-                .id(result.getId())
-                .name(result.getName())
-                .iconId(result.getIconId())
-                .createdByUser(result.getCreatedByUser().toGetResponse())
-                .build();
+        log.debug("[finish] WorkoutService - createWorkout");
+        return result.toGetResponse();
+    }
+
+    @Transactional
+    public List<ExerciseGetResponse> createExercises(UUID workoutId, List<CreateExerciseRequest> createExerciseRequest) {
+        log.debug("[start] WorkoutService - createExercises");
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(() -> new WorkoutNotFoundException("Workout not found!"));
+
+        List<ExerciseGetResponse> response = createExerciseRequest.stream()
+                .map(exerciseRequest -> {
+                    Exercise exercise = exerciseRepository.save(Exercise.builder()
+                            .name(exerciseRequest.name())
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .build());
+
+                    WorkoutExercise relation = workoutExerciseRepository.save(WorkoutExercise.builder()
+                            .id(new WorkoutExerciseId(workout.getId(), exercise.getId()))
+                            .series(exerciseRequest.series())
+                            .repsGoals(exerciseRequest.repsGoals())
+                            .weightGoals(exerciseRequest.weightGoals())
+                            .build());
+
+                    return ExerciseGetResponse.builder()
+                            .name(exercise.getName())
+                            .series(relation.getSeries())
+                            .repsGoals(relation.getRepsGoals())
+                            .weightGoals(relation.getWeightGoals())
+                            .build();
+                })
+                .toList();
+        log.debug("[finish] WorkoutService - createExercises");
+        return response;
     }
 }
