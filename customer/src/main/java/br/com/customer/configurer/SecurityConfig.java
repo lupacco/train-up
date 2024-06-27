@@ -46,7 +46,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/authenticate", "/register").permitAll()
+                .requestMatchers("/api/v1/authenticate", "/api/v1/register").permitAll()
                 .anyRequest().authenticated())
             .httpBasic(Customizer.withDefaults())
             .oauth2ResourceServer(conf -> conf.jwt(Customizer.withDefaults()));

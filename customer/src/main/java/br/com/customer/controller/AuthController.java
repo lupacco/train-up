@@ -36,13 +36,6 @@ public class AuthController {
         log.debug("[finish] AuthController - authenticate");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-//    @PostMapping("/authenticate")
-//    public ResponseEntity<AuthenticationResponse> authenticate(Authentication authenticationRequest){
-//        log.debug("[start] AuthController - authenticate");
-//        var response = authService.authenticate(authenticationRequest);
-//        log.debug("[finish] AuthController - authenticate");
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
 
     @GetMapping("/test")
     public ResponseEntity<String> test(){

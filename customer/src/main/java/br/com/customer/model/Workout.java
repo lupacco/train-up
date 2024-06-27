@@ -1,5 +1,6 @@
 package br.com.customer.model;
 
+import br.com.customer.dto.response.WorkoutGetResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,14 @@ public class Workout {
     @ManyToMany(mappedBy = "assignedWorkouts")
     private Set<CustomerUser> customerUserSet;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
+    @JoinTable(
+            name = "workout_exercise",
+            joinColumns = @JoinColumn(name = "workout_id"),
+            inverseJoinColumns = @JoinColumn(name = "exercise_id")
+    )
+    private Set<Exercise> assignedExercises;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -46,4 +55,13 @@ public class Workout {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public WorkoutGetResponse toGetResponse(){
+        return WorkoutGetResponse.builder()
+                .id(this.id)
+                .name(this.name)
+                .iconId(this.iconId)
+                .createdByUser(this.createdByUser.toGetResponse())
+                .build();
+    }
 }
