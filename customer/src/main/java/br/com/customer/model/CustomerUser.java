@@ -39,17 +39,6 @@ public class CustomerUser {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    @OneToMany(mappedBy = "createdByUser")
-    private Set<Workout> createdWorkouts;
-
-    @ManyToMany
-    @JoinTable(
-            name = "user_workout",
-            joinColumns = @JoinColumn(name = "customer_user_id")
-            ,inverseJoinColumns = @JoinColumn(name = "workout_id")
-    )
-    private Set<Workout> assignedWorkouts;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 

@@ -36,8 +36,13 @@ public class Workout {
     @JoinColumn(name = "created_by_user", nullable = false)
     private CustomerUser createdByUser;
 
-    @ManyToMany(mappedBy = "assignedWorkouts")
-    private Set<CustomerUser> customerUserSet;
+    @ManyToMany
+    @JoinTable(
+            name = "user_workout",
+            joinColumns = @JoinColumn(name = "workout_id")
+            ,inverseJoinColumns = @JoinColumn(name = "customer_user_id")
+    )
+    private Set<CustomerUser> assignedUsers;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(

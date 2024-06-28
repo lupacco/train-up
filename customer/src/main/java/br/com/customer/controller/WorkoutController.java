@@ -38,4 +38,13 @@ public class WorkoutController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/{customerId}")
+    public ResponseEntity<List<WorkoutGetResponse>> listAllCustomerWorkouts(@PathVariable(name = "customerId") UUID customerId){
+        log.debug("[start] CustomerUserController - listAllCustomerWorkouts");
+        var response = workoutService.listAllCustomerWorkouts(customerId);
+        log.debug("[finish] CustomerUserController - listAllCustomerWorkouts");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
 }

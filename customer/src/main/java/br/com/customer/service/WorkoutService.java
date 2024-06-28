@@ -15,8 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,18 +29,19 @@ public class WorkoutService {
 
     @Transactional
     public WorkoutGetResponse createWorkout(CreateWorkoutRequest createWorkoutRequest){
-        CustomerUser customerUser = customerUserService.findById(createWorkoutRequest.userId());
         log.debug("[start] WorkoutService - createWorkout");
+        CustomerUser customerUser = customerUserService.findById(createWorkoutRequest.userId());
+        Set<CustomerUser> customerAttr = Collections.singleton(customerUser);
         Workout workout = Workout.builder()
                 .name(createWorkoutRequest.name())
                 .iconId(createWorkoutRequest.iconId())
                 .createdByUser(customerUser)
+                .assignedUsers(customerAttr)
                 .isDeleted(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .deletedAt(null)
                 .build();
-
         Workout result = workoutRepository.save(workout);
         log.debug("[finish] WorkoutService - createWorkout");
         return result.toGetResponse();
