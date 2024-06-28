@@ -45,13 +45,4 @@ public class CustomerUserService {
         return result;
     }
 
-    public List<WorkoutGetResponse> listAllCustomerWorkouts(UUID customerId) {
-        log.debug("[start] CustomerService - listAllCustomerWorkouts");
-        CustomerUser customerUser = findById(customerId);
-        var result = customerUser.getAssignedWorkouts().stream()
-                .map(Workout::toGetResponse)
-                .toList();
-        log.debug("[finish] CustomerService - listAllCustomerWorkouts");
-        return result;
-    }
 }
