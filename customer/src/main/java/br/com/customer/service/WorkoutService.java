@@ -79,4 +79,13 @@ public class WorkoutService {
         log.debug("[finish] WorkoutService - createExercises");
         return response;
     }
+
+    public List<WorkoutGetResponse> listAllCustomerWorkouts(UUID customerId) {
+        log.debug("[start] WorkoutService - listAllCustomerWorkouts");
+        var result = workoutRepository.findAllCustomerWorkouts(customerId).stream()
+                .map(Workout::toGetResponse)
+                .toList();
+        log.debug("[finish] WorkoutService - listAllCustomerWorkouts");
+        return result;
+    }
 }
