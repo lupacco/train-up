@@ -26,7 +26,7 @@ public class WorkoutExercise {
     Short series;
 
     @Column(name = "rep_goals")
-    List<Short> repsGoals;
+    List<Short> repGoals;
 
     @Column(name = "weight_goals")
     List<Float> weightGoals;

@@ -1,7 +1,7 @@
 package br.com.customer.configurer;
 
 import br.com.customer.model.UserDetailsServiceImpl;
-import br.com.customer.repository.CustomerUserRepository;
+import br.com.customer.repository.jpa.JpaCustomerUserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Value("${jwt.private-key}")
     private RSAPrivateKey priv;
 
-    private final CustomerUserRepository customerUserRepository;
+    private final JpaCustomerUserRepository jpaCustomerUserRepository;
 
 
     @Bean
@@ -69,7 +69,7 @@ public class SecurityConfig {
     @Bean
     AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(new UserDetailsServiceImpl(customerUserRepository));
+        authProvider.setUserDetailsService(new UserDetailsServiceImpl(jpaCustomerUserRepository));
         authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;

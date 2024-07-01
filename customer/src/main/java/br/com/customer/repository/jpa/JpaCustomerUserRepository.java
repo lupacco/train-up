@@ -1,4 +1,4 @@
-package br.com.customer.repository;
+package br.com.customer.repository.jpa;
 
 import br.com.customer.model.CustomerUser;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CustomerUserRepository extends JpaRepository<CustomerUser, UUID> {
+public interface JpaCustomerUserRepository extends JpaRepository<CustomerUser, UUID> {
     Optional<CustomerUser> findByUsername(String username);
 
     Optional<CustomerUser> findByEmail(String email);
