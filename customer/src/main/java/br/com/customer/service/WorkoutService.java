@@ -7,7 +7,6 @@ import br.com.customer.dto.response.WorkoutGetResponse;
 import br.com.customer.exception.WorkoutNotFoundException;
 import br.com.customer.model.*;
 import br.com.customer.repository.ExerciseRepository;
-import br.com.customer.repository.jpa.JpaExerciseRepository;
 import br.com.customer.repository.jpa.JpaWorkoutExerciseRepository;
 import br.com.customer.repository.jpa.JpaWorkoutRepository;
 import jakarta.transaction.Transactional;
@@ -16,7 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class WorkoutService {
 
     private final JpaWorkoutRepository jpaWorkoutRepository;
     private final JpaWorkoutExerciseRepository jpaWorkoutExerciseRepository;
-    private final JpaExerciseRepository jpaExerciseRepository;
     private final CustomerUserService customerUserService;
     private final ExerciseRepository exerciseRepository;
 
@@ -60,7 +61,7 @@ public class WorkoutService {
         Workout workout = findById(workoutId);
         List<ExerciseGetResponse> response = createExerciseRequest.stream()
                 .map(exerciseRequest -> {
-                    Exercise exercise = jpaExerciseRepository.save(Exercise.builder()
+                    Exercise exercise = exerciseRepository.save(Exercise.builder()
                             .name(exerciseRequest.name())
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
@@ -98,23 +99,7 @@ public class WorkoutService {
     public List<ExerciseGetResponse> listAllWorkoutExercises(UUID workoutId) {
         log.debug("[start] WorkoutService - listAllWorkoutExercises");
         findById(workoutId);
-//        using Jpa
-//        List<Exercise> exercises = jpaExerciseRepository.findAllExercisesFromWorkout(workoutId);
-//        List<ExerciseGetResponse> response = exercises.stream()
-//                .map(exercise -> {
-//                        WorkoutExercise relation = jpaWorkoutExerciseRepository.findWorkoutExerciseRelation(workoutId, exercise.getId());
-//                        return ExerciseGetResponse.builder()
-//                        .name(exercise.getName())
-//                        .series(relation.getSeries())
-//                        .repsGoals(relation.getRepGoals())
-//                        .weightGoals(relation.getWeightGoals())
-//                        .build();
-//                })
-//                .toList();
-
-
         List<ExerciseWorkoutGoals> exercises = exerciseRepository.listAllWorkoutExercisesWithGoals(workoutId);
-
         List<ExerciseGetResponse> response = exercises.stream()
             .map(exercise ->
                 ExerciseGetResponse.builder()
@@ -124,7 +109,6 @@ public class WorkoutService {
                     .weightGoals(exercise.getWeightGoals())
                     .build())
             .toList();
-
         log.debug("[finish] WorkoutService - listAllWorkoutExercises");
         return response;
     }
