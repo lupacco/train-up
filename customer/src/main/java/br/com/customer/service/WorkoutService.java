@@ -51,7 +51,7 @@ public class WorkoutService {
     public List<ExerciseGetResponse> createExercises(UUID workoutId, List<CreateExerciseRequest> createExerciseRequest) {
         log.debug("[start] WorkoutService - createExercises");
         Workout workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() -> new WorkoutNotFoundException("Workout not found!"));
+                .orElseThrow(WorkoutNotFoundException::new);
 
         List<ExerciseGetResponse> response = createExerciseRequest.stream()
                 .map(exerciseRequest -> {
@@ -82,10 +82,22 @@ public class WorkoutService {
 
     public List<WorkoutGetResponse> listAllCustomerWorkouts(UUID customerId) {
         log.debug("[start] WorkoutService - listAllCustomerWorkouts");
+        customerUserService.findById(customerId);
         var result = workoutRepository.findAllCustomerWorkouts(customerId).stream()
                 .map(Workout::toGetResponse)
                 .toList();
         log.debug("[finish] WorkoutService - listAllCustomerWorkouts");
         return result;
+    }
+
+    public List<ExerciseGetResponse> listAllWorkoutExercises(UUID workoutId) {
+        log.debug("[start] WorkoutService - listAllWorkoutExercises");
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(WorkoutNotFoundException::new);
+
+        log.info(workout.toString());
+
+        log.debug("[finish] WorkoutService - listAllWorkoutExercises");
+        return new ArrayList<>();
     }
 }

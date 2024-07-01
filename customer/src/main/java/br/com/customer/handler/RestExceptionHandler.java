@@ -1,5 +1,6 @@
 package br.com.customer.handler;
 
+import br.com.customer.exception.APIException;
 import br.com.customer.exception.ConflictException;
 import br.com.customer.exception.ExceptionDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,11 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class RestExceptionHandler {
+
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<ExceptionDetails> handleAPIException(HttpServletRequest request, APIException exception){
+        return exception.buildErrorResponse(request);
+    }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ExceptionDetails> handleConflictException(HttpServletRequest request, ConflictException exception){
