@@ -3,6 +3,7 @@ package br.com.customer.service;
 import br.com.customer.dto.response.CustomerUserGetResponse;
 import br.com.customer.dto.response.WorkoutGetResponse;
 import br.com.customer.exception.UserEmailNotFoundException;
+import br.com.customer.exception.UserNotFoundException;
 import br.com.customer.model.CustomerUser;
 import br.com.customer.model.Workout;
 import br.com.customer.repository.CustomerUserRepository;
@@ -40,7 +41,7 @@ public class CustomerUserService {
     public CustomerUser findById(UUID customerId) {
         log.debug("[start] CustomerService - findById");
         var result = customerUserRepository.findById(customerId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+                .orElseThrow(UserNotFoundException::new);
         log.debug("[finish] CustomerService - findById");
         return result;
     }
