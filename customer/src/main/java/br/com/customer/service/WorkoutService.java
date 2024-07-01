@@ -7,8 +7,9 @@ import br.com.customer.dto.response.WorkoutGetResponse;
 import br.com.customer.exception.WorkoutNotFoundException;
 import br.com.customer.model.*;
 import br.com.customer.repository.ExerciseRepository;
-import br.com.customer.repository.WorkoutExerciseRepository;
-import br.com.customer.repository.WorkoutRepository;
+import br.com.customer.repository.jpa.JpaExerciseRepository;
+import br.com.customer.repository.jpa.JpaWorkoutExerciseRepository;
+import br.com.customer.repository.jpa.JpaWorkoutRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,11 @@ import java.util.*;
 @Slf4j
 public class WorkoutService {
 
-    private final WorkoutRepository workoutRepository;
-    private final WorkoutExerciseRepository workoutExerciseRepository;
-    private final ExerciseRepository exerciseRepository;
+    private final JpaWorkoutRepository jpaWorkoutRepository;
+    private final JpaWorkoutExerciseRepository jpaWorkoutExerciseRepository;
+    private final JpaExerciseRepository jpaExerciseRepository;
     private final CustomerUserService customerUserService;
+    private final ExerciseRepository exerciseRepository;
 
     @Transactional
     public WorkoutGetResponse createWorkout(CreateWorkoutRequest createWorkoutRequest){
@@ -42,13 +44,13 @@ public class WorkoutService {
                 .updatedAt(LocalDateTime.now())
                 .deletedAt(null)
                 .build();
-        Workout result = workoutRepository.save(workout);
+        Workout result = jpaWorkoutRepository.save(workout);
         log.debug("[finish] WorkoutService - createWorkout");
         return result.toGetResponse();
     }
 
     public Workout findById(UUID workoutId){
-        return workoutRepository.findById(workoutId)
+        return jpaWorkoutRepository.findById(workoutId)
                 .orElseThrow(WorkoutNotFoundException::new);
     }
 
@@ -58,23 +60,23 @@ public class WorkoutService {
         Workout workout = findById(workoutId);
         List<ExerciseGetResponse> response = createExerciseRequest.stream()
                 .map(exerciseRequest -> {
-                    Exercise exercise = exerciseRepository.save(Exercise.builder()
+                    Exercise exercise = jpaExerciseRepository.save(Exercise.builder()
                             .name(exerciseRequest.name())
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
                             .build());
 
-                    WorkoutExercise relation = workoutExerciseRepository.save(WorkoutExercise.builder()
+                    WorkoutExercise relation = jpaWorkoutExerciseRepository.save(WorkoutExercise.builder()
                             .id(new WorkoutExerciseId(workout.getId(), exercise.getId()))
                             .series(exerciseRequest.series())
-                            .repsGoals(exerciseRequest.repsGoals())
+                            .repGoals(exerciseRequest.repsGoals())
                             .weightGoals(exerciseRequest.weightGoals())
                             .build());
 
                     return ExerciseGetResponse.builder()
                             .name(exercise.getName())
                             .series(relation.getSeries())
-                            .repsGoals(relation.getRepsGoals())
+                            .repsGoals(relation.getRepGoals())
                             .weightGoals(relation.getWeightGoals())
                             .build();
                 })
@@ -86,7 +88,7 @@ public class WorkoutService {
     public List<WorkoutGetResponse> listAllCustomerWorkouts(UUID customerId) {
         log.debug("[start] WorkoutService - listAllCustomerWorkouts");
         customerUserService.findById(customerId);
-        var result = workoutRepository.findAllCustomerWorkouts(customerId).stream()
+        var result = jpaWorkoutRepository.findAllCustomerWorkouts(customerId).stream()
                 .map(Workout::toGetResponse)
                 .toList();
         log.debug("[finish] WorkoutService - listAllCustomerWorkouts");
@@ -95,9 +97,35 @@ public class WorkoutService {
 
     public List<ExerciseGetResponse> listAllWorkoutExercises(UUID workoutId) {
         log.debug("[start] WorkoutService - listAllWorkoutExercises");
-        Workout workout = findById(workoutId);
+        findById(workoutId);
+//        using Jpa
+//        List<Exercise> exercises = jpaExerciseRepository.findAllExercisesFromWorkout(workoutId);
+//        List<ExerciseGetResponse> response = exercises.stream()
+//                .map(exercise -> {
+//                        WorkoutExercise relation = jpaWorkoutExerciseRepository.findWorkoutExerciseRelation(workoutId, exercise.getId());
+//                        return ExerciseGetResponse.builder()
+//                        .name(exercise.getName())
+//                        .series(relation.getSeries())
+//                        .repsGoals(relation.getRepGoals())
+//                        .weightGoals(relation.getWeightGoals())
+//                        .build();
+//                })
+//                .toList();
+
+
+        List<ExerciseWorkoutGoals> exercises = exerciseRepository.listAllWorkoutExercisesWithGoals(workoutId);
+
+        List<ExerciseGetResponse> response = exercises.stream()
+            .map(exercise ->
+                ExerciseGetResponse.builder()
+                    .name(exercise.getName())
+                    .series(exercise.getSeries())
+                    .repsGoals(exercise.getRepGoals())
+                    .weightGoals(exercise.getWeightGoals())
+                    .build())
+            .toList();
 
         log.debug("[finish] WorkoutService - listAllWorkoutExercises");
-        return new ArrayList<>();
+        return response;
     }
 }

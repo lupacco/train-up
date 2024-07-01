@@ -1,4 +1,4 @@
-package br.com.customer.repository;
+package br.com.customer.repository.jpa;
 
 import br.com.customer.model.Workout;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface WorkoutRepository extends JpaRepository<Workout, UUID> {
+public interface JpaWorkoutRepository extends JpaRepository<Workout, UUID> {
 
     @Query(value = """
-            SELECT w.* FROM workout w
-            JOIN user_workout uw ON uw.workout_id = w.id
-            JOIN customer_user cu ON cu.id = uw.customer_user_id
-            WHERE cu.id = :customerId
+            select w.* from workout w
+            join user_workout uw on uw.workout_id = w.id
+            join customer_user cu on cu.id = uw.customer_user_id
+            where cu.id = :customerId
             """, nativeQuery = true)
     List<Workout> findAllCustomerWorkouts(@Param("customerId") UUID customerId);
 }

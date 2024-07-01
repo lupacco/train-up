@@ -1,36 +1,35 @@
 package br.com.customer.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "exercise")
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
 @Data
-public class Exercise {
+public class ExerciseWorkoutGoals {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
-    @Column(nullable = false)
     String name;
 
-    @Column(name = "created_at", nullable = false)
+    private Short series;
+
+    private List<Short> repGoals;
+
+    private List<Float> weightGoals;
+
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
 }

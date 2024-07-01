@@ -6,14 +6,11 @@ import br.com.customer.dto.response.AuthenticationResponse;
 import br.com.customer.dto.response.CustomerUserGetResponse;
 import br.com.customer.exception.ConflictException;
 import br.com.customer.model.CustomerUser;
-import br.com.customer.model.UserAuthenticated;
-import br.com.customer.model.UserDetailsServiceImpl;
-import br.com.customer.repository.CustomerUserRepository;
+import br.com.customer.repository.jpa.JpaCustomerUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class AuthService {
 
-    private final CustomerUserRepository customerUserRepository;
+    private final JpaCustomerUserRepository jpaCustomerUserRepository;
     private final JwtService jwtService;
     private final AuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
@@ -33,8 +30,8 @@ public class AuthService {
 
     public CustomerUserGetResponse register(RegisterRequest registerRequest){
         log.debug("[start] AuthService - register");
-        if(customerUserRepository.findByUsername(registerRequest.username()).isPresent()) throw new ConflictException("Username already in use.");
-        if(customerUserRepository.findByEmail(registerRequest.email()).isPresent()) throw new ConflictException("Email already in use.");
+        if(jpaCustomerUserRepository.findByUsername(registerRequest.username()).isPresent()) throw new ConflictException("Username already in use.");
+        if(jpaCustomerUserRepository.findByEmail(registerRequest.email()).isPresent()) throw new ConflictException("Email already in use.");
         CustomerUser customer = CustomerUser.builder()
                 .id(UUID.randomUUID())
                 .name(registerRequest.name())
@@ -46,7 +43,7 @@ public class AuthService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        CustomerUser result = customerUserRepository.save(customer);
+        CustomerUser result = jpaCustomerUserRepository.save(customer);
         log.debug("[finish] AuthService - register");
 
         return CustomerUserGetResponse.builder()

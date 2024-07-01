@@ -1,18 +1,15 @@
 package br.com.customer.service;
 
 import br.com.customer.dto.response.CustomerUserGetResponse;
-import br.com.customer.dto.response.WorkoutGetResponse;
 import br.com.customer.exception.UserEmailNotFoundException;
 import br.com.customer.exception.UserNotFoundException;
 import br.com.customer.model.CustomerUser;
-import br.com.customer.model.Workout;
-import br.com.customer.repository.CustomerUserRepository;
+import br.com.customer.repository.jpa.JpaCustomerUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,11 +17,11 @@ import java.util.UUID;
 @Log4j2
 public class CustomerUserService {
 
-    private final CustomerUserRepository customerUserRepository;
+    private final JpaCustomerUserRepository jpaCustomerUserRepository;
 
     public CustomerUserGetResponse findByUsername(String username){
         log.debug("[start] CustomerService - findByUsername");
-        var result = customerUserRepository.findByUsername(username)
+        var result = jpaCustomerUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
         log.debug("[finish] CustomerService - findByUsername");
         return result.toGetResponse();
@@ -32,7 +29,7 @@ public class CustomerUserService {
 
     public CustomerUser findByEmail(String email){
         log.debug("[start] CustomerService - findByEmail");
-        var result = customerUserRepository.findByEmail(email)
+        var result = jpaCustomerUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UserEmailNotFoundException("User not found"));
         log.debug("[finish] CustomerService - findByEmail");
         return result;
@@ -40,7 +37,7 @@ public class CustomerUserService {
 
     public CustomerUser findById(UUID customerId) {
         log.debug("[start] CustomerService - findById");
-        var result = customerUserRepository.findById(customerId)
+        var result = jpaCustomerUserRepository.findById(customerId)
                 .orElseThrow(UserNotFoundException::new);
         log.debug("[finish] CustomerService - findById");
         return result;
