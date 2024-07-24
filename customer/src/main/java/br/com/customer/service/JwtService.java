@@ -1,8 +1,10 @@
 package br.com.customer.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
@@ -10,13 +12,16 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class JwtService {
 
     private final JwtEncoder encoder;
+    private final JwtDecoder decoder;
 
-    public JwtService(JwtEncoder encoder) {
+    public JwtService(JwtEncoder encoder, JwtDecoder decoder) {
         this.encoder = encoder;
+        this.decoder = decoder;
     }
 
     public String generateToken(Authentication authentication){
@@ -36,5 +41,9 @@ public class JwtService {
 
 
         return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public String extractUsername(String token){
+        return decoder.decode(token).getSubject();
     }
 }

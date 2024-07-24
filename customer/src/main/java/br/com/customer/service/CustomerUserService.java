@@ -18,6 +18,7 @@ import java.util.UUID;
 public class CustomerUserService {
 
     private final JpaCustomerUserRepository jpaCustomerUserRepository;
+    private final JwtService jwtService;
 
     public CustomerUserGetResponse findByUsername(String username){
         log.debug("[start] CustomerService - findByUsername");
@@ -43,4 +44,14 @@ public class CustomerUserService {
         return result;
     }
 
+    public CustomerUserGetResponse findByToken(String authorization) {
+        log.debug("[start] CustomerService - findByToken");
+        String token = authorization.split(" ")[1];
+        String username = jwtService.extractUsername(token);
+
+        var result = jpaCustomerUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+        log.debug("[finish] CustomerService - findByToken");
+        return result.toGetResponse();
+    }
 }
