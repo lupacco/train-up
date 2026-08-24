@@ -38,11 +38,11 @@ public class WorkoutController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{customerId}")
-    public ResponseEntity<List<WorkoutGetResponse>> listAllCustomerWorkouts(@PathVariable(name = "customerId") UUID customerId){
-        log.debug("[start] WorkoutController - listAllCustomerWorkouts");
-        var response = workoutService.listAllCustomerWorkouts(customerId);
-        log.debug("[finish] WorkoutController - listAllCustomerWorkouts");
+    @GetMapping("/me")
+    public ResponseEntity<List<WorkoutGetResponse>> listMyWorkouts(){
+        log.debug("[start] WorkoutController - listMyWorkouts");
+        var response = workoutService.listMyWorkouts();
+        log.debug("[finish] WorkoutController - listMyWorkouts");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

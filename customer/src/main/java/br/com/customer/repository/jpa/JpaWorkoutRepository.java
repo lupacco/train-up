@@ -19,4 +19,10 @@ public interface JpaWorkoutRepository extends JpaRepository<Workout, UUID> {
             where cu.id = :customerId
             """, nativeQuery = true)
     List<Workout> findAllCustomerWorkouts(@Param("customerId") UUID customerId);
+
+    @Query(value = """
+            select count(*) > 0 from user_workout uw
+            where uw.workout_id = :workoutId and uw.customer_user_id = :customerId
+            """, nativeQuery = true)
+    boolean isAssignedToUser(@Param("workoutId") UUID workoutId, @Param("customerId") UUID customerId);
 }

@@ -4,6 +4,7 @@ import br.com.customer.dto.request.CreateExerciseRequest;
 import br.com.customer.dto.request.CreateWorkoutRequest;
 import br.com.customer.dto.response.ExerciseGetResponse;
 import br.com.customer.dto.response.WorkoutGetResponse;
+import br.com.customer.exception.ForbiddenException;
 import br.com.customer.exception.WorkoutNotFoundException;
 import br.com.customer.model.*;
 import br.com.customer.repository.ExerciseRepository;
@@ -27,13 +28,13 @@ public class WorkoutService {
 
     private final JpaWorkoutRepository jpaWorkoutRepository;
     private final JpaWorkoutExerciseRepository jpaWorkoutExerciseRepository;
-    private final CustomerUserService customerUserService;
+    private final CurrentUserService currentUserService;
     private final ExerciseRepository exerciseRepository;
 
     @Transactional
     public WorkoutGetResponse createWorkout(CreateWorkoutRequest createWorkoutRequest){
         log.debug("[start] WorkoutService - createWorkout");
-        CustomerUser customerUser = customerUserService.findById(createWorkoutRequest.userId());
+        CustomerUser customerUser = currentUserService.require();
         Set<CustomerUser> customerAttr = Collections.singleton(customerUser);
         Workout workout = Workout.builder()
                 .name(createWorkoutRequest.name())
@@ -55,10 +56,28 @@ public class WorkoutService {
                 .orElseThrow(WorkoutNotFoundException::new);
     }
 
+    /**
+     * Same as findById, but refuses workouts that are not assigned to the caller.
+     * Every workout-scoped endpoint goes through here so a valid token for user A
+     * cannot read or write user B's data.
+     */
+    public Workout findOwnedById(UUID workoutId){
+        log.debug("[start] WorkoutService - findOwnedById");
+        Workout workout = findById(workoutId);
+        CustomerUser customerUser = currentUserService.require();
+
+        if (!jpaWorkoutRepository.isAssignedToUser(workout.getId(), customerUser.getId())) {
+            throw new ForbiddenException();
+        }
+
+        log.debug("[finish] WorkoutService - findOwnedById");
+        return workout;
+    }
+
     @Transactional
     public List<ExerciseGetResponse> createExercises(UUID workoutId, List<CreateExerciseRequest> createExerciseRequest) {
         log.debug("[start] WorkoutService - createExercises");
-        Workout workout = findById(workoutId);
+        Workout workout = findOwnedById(workoutId);
         List<ExerciseGetResponse> response = createExerciseRequest.stream()
                 .map(exerciseRequest -> {
                     Exercise exercise = exerciseRepository.save(Exercise.builder()
@@ -86,19 +105,19 @@ public class WorkoutService {
         return response;
     }
 
-    public List<WorkoutGetResponse> listAllCustomerWorkouts(UUID customerId) {
-        log.debug("[start] WorkoutService - listAllCustomerWorkouts");
-        customerUserService.findById(customerId);
-        var result = jpaWorkoutRepository.findAllCustomerWorkouts(customerId).stream()
+    public List<WorkoutGetResponse> listMyWorkouts() {
+        log.debug("[start] WorkoutService - listMyWorkouts");
+        CustomerUser customerUser = currentUserService.require();
+        var result = jpaWorkoutRepository.findAllCustomerWorkouts(customerUser.getId()).stream()
                 .map(Workout::toGetResponse)
                 .toList();
-        log.debug("[finish] WorkoutService - listAllCustomerWorkouts");
+        log.debug("[finish] WorkoutService - listMyWorkouts");
         return result;
     }
 
     public List<ExerciseGetResponse> listAllWorkoutExercises(UUID workoutId) {
         log.debug("[start] WorkoutService - listAllWorkoutExercises");
-        findById(workoutId);
+        findOwnedById(workoutId);
         List<ExerciseWorkoutGoals> exercises = exerciseRepository.listAllWorkoutExercisesWithGoals(workoutId);
         List<ExerciseGetResponse> response = exercises.stream()
             .map(exercise ->
