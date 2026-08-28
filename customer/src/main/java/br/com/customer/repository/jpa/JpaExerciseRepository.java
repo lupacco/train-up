@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -19,5 +20,7 @@ public interface JpaExerciseRepository extends JpaRepository<Exercise, UUID> {
                where w.id = :workoutId
             """, nativeQuery = true)
     List<Exercise> findAllExercisesFromWorkout(@Param("workoutId")UUID workoutId);
+
+    Optional<Exercise> findFirstByNameIgnoreCaseAndDeletedAtIsNull(String name);
 
 }

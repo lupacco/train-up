@@ -80,12 +80,10 @@ public class WorkoutService {
         Workout workout = findOwnedById(workoutId);
         List<ExerciseGetResponse> response = createExerciseRequest.stream()
                 .map(exerciseRequest -> {
-                    Exercise exercise = exerciseRepository.save(Exercise.builder()
-                            .name(exerciseRequest.name())
-                            .createdAt(LocalDateTime.now())
-                            .updatedAt(LocalDateTime.now())
-                            .build());
+                    Exercise exercise = exerciseRepository.findOrCreateByName(exerciseRequest.name());
 
+                    // Re-adding an exercise to the same workout updates its goals,
+                    // since (workout_id, exercise_id) is the primary key.
                     WorkoutExercise relation = jpaWorkoutExerciseRepository.save(WorkoutExercise.builder()
                             .id(new WorkoutExerciseId(workout.getId(), exercise.getId()))
                             .series(exerciseRequest.series())
@@ -94,6 +92,7 @@ public class WorkoutService {
                             .build());
 
                     return ExerciseGetResponse.builder()
+                            .exerciseId(exercise.getId())
                             .name(exercise.getName())
                             .series(relation.getSeries())
                             .repsGoals(relation.getRepGoals())
@@ -122,6 +121,7 @@ public class WorkoutService {
         List<ExerciseGetResponse> response = exercises.stream()
             .map(exercise ->
                 ExerciseGetResponse.builder()
+                    .exerciseId(exercise.getId())
                     .name(exercise.getName())
                     .series(exercise.getSeries())
                     .repsGoals(exercise.getRepGoals())

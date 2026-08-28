@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ public class ExerciseRepository {
                 .map(exercise -> {
                         WorkoutExercise relation = jpaWorkoutExerciseRepository.findWorkoutExerciseRelation(workoutId, exercise.getId());
                         return ExerciseGetResponse.builder()
+                        .exerciseId(exercise.getId())
                         .name(exercise.getName())
                         .series(relation.getSeries())
                         .repsGoals(relation.getRepGoals())
@@ -57,5 +59,22 @@ public class ExerciseRepository {
 
     public Exercise save(Exercise exercise){
         return jpaExerciseRepository.save(exercise);
+    }
+
+    /**
+     * The exercise table is a shared catalog: reusing the row by name keeps a
+     * single id per movement, which is what makes progression across workouts
+     * and sessions possible. Per-workout goals live in workout_exercise.
+     */
+    public Exercise findOrCreateByName(String name){
+        log.debug("[start] ExerciseRepository - findOrCreateByName");
+        Exercise result = jpaExerciseRepository.findFirstByNameIgnoreCaseAndDeletedAtIsNull(name)
+                .orElseGet(() -> jpaExerciseRepository.save(Exercise.builder()
+                        .name(name)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build()));
+        log.debug("[finish] ExerciseRepository - findOrCreateByName");
+        return result;
     }
 }
