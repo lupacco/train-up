@@ -31,10 +31,24 @@
 		<maven.compiler.version>17</maven.compiler.version>
 		<spring.boot.maven.plugin.version>3.3.1</spring.boot.maven.plugin.version>
 		<spring.boot.dependencies.version>3.3.1</spring.boot.dependencies.version>
+		<!--Without spring-boot-starter-parent, Maven defaults to Surefire 2.12.4,
+		    which cannot discover JUnit 5 tests.-->
+		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<!--Declared before spring-boot-dependencies so it wins: the version
+			    pinned by Boot 3.3.1 talks Docker API 1.32, which modern Docker
+			    daemons refuse.-->
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
@@ -71,6 +85,11 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${spring.boot.maven.plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>
