@@ -1,6 +1,7 @@
 package br.com.customer.repository;
 
 import br.com.customer.dto.response.ExerciseGetResponse;
+import br.com.customer.exception.ExerciseNotFoundException;
 import br.com.customer.model.Exercise;
 import br.com.customer.model.ExerciseWorkoutGoals;
 import br.com.customer.model.WorkoutExercise;
@@ -59,6 +60,11 @@ public class ExerciseRepository {
 
     public Exercise save(Exercise exercise){
         return jpaExerciseRepository.save(exercise);
+    }
+
+    public Exercise findById(UUID exerciseId){
+        return jpaExerciseRepository.findById(exerciseId)
+                .orElseThrow(ExerciseNotFoundException::new);
     }
 
     /**
